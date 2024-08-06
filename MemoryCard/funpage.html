@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="fun.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@200;300;500;700&display=swap" rel="stylesheet">
+    <title>Memory Game</title>
+    
+  </head>
+  <body>
+    <div class="control-buttons">
+      <span>أبدأ اللعبة</span>
+  
+    </div>
+
+    <h1 style=
+    "color:#fe9c6f;
+    text-align: center;
+    font-size: 36px;
+    font-weight: 500;
+    padding: 20px;" >لعبة الذاكرة</h1>
+    <h2 style=
+    "text-align: center;">لعبة البطاقات المتشابهة</h2>
+
+    <div class="info-container">
+     
+        <div class="status" style="margin-left: 290px;">
+          النقاط المكتسبة: <span class="points-needed">0</span>
+        </div>
+        <div class="status" style="margin-left:50px ;">
+          النقاط المفقودة: <span class="mistakes-allowed">0</span>
+        </div>
+        
+          
+    
+    </div>
+
+    <div class="memory-game-blocks">
+        <div class="game-block" data-technology="photo1">
+            <div class="face front"></div>
+            <div class="face back">
+                <img src="image_f/photo1.png" alt="">
+            </div>
+        </div>
+      <div class="game-block" data-technology="photo1">
+        <div class="face front"></div>
+        <div class="face back">
+          <img src="image_f/photo1.png" alt="">
+        </div>
+      </div>
+      <div class="game-block" data-technology="photo2">
+        <div class="face front"></div>
+        <div class="face back">
+          <img src="image_f/photo2.png" alt="">
+        </div>
+      </div>
+      <div class="game-block" data-technology="photo2">
+        <div class="face front"></div>
+        <div class="face back">
+          <img src="image_f/photo2.png" alt="">
+        </div>
+      </div>
+      <div class="game-block" data-technology="photo3">
+        <div class="face front"></div>
+        <div class="face back">
+          <img src="image_f/photo3.png" alt="">
+        </div>
+      </div>
+      <div class="game-block" data-technology="photo3">
+        <div class="face front"></div>
+        <div class="face back">
+          <img src="image_f/photo3.png" alt="">
+        </div>
+      </div>
+      <div class="game-block" data-technology="photo4">
+        <div class="face front"></div>
+        <div class="face back">
+          <img src="image_f/photo4.png" alt="">
+        </div>
+      </div>
+      <div class="game-block" data-technology="photo4">
+        <div class="face front"></div>
+        <div class="face back">
+          <img src="image_f/photo4.png" alt="">
+        </div>
+      </div>
+      
+      </div>
+    </div>
+
+    
+    <div class="popup" id="popup">
+        <div class="main-ui">
+            <h3>فكر فكر!</h3>
+            <p >اكتب الإجابة الصحيحة</p>
+
+            <p class="problem"></p> <!--for quation-->
+        
+            <form action="" class="our-form"> <!--to answer-->
+                <input type="text" class="our-field" autocomplete="off">
+                <button >Submit</button>
+                
+            </form>
+            <div class="status">
+              <span class="mm"></span>
+            </div>
+            
+        </div>
+        <div class="overlay">
+            <div class="overlay-inner">
+            <h2 class="con-message"></h2>
+            <p class="end-message"></p>
+            </div>
+        </div>
+    </div>
+
+    <div class="popup_p" id="popup_p">
+      <h1>أحسنت</h1>
+    </div>
+                
+  
+
+    <script src="fun.js"></script>
+  </body>
+</html>

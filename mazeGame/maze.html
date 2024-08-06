@@ -1,0 +1,813 @@
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Maze game</title>
+    <link rel="stylesheet" href="cssfile.css">
+
+
+	</head>
+
+
+	<body>
+
+    <!-- --------------------MODAL----------------->
+
+    <!-- The Modal -->
+    <div id="myModal" class="modal">
+
+      <!-- Modal content -->
+      
+       
+        <div id="chart"></div>
+    <div id="question"><h1></h1></div>
+    <div class="wrapper">
+      <div class="container">
+        <canvas id="wheel"></canvas>
+        <button id="spin-btn">أدر </button>
+        <img src="spinner-arrow-.svg" alt="spinner-arrow" />
+      </div>
+      <div id="final-value">
+        <p>اضغط على مفتاح المسافة لبدء الدوران</p>
+      </div>
+    </div>
+
+    </div>
+
+
+    <!--script src="https://threejs.org/build/three.js"></script-->
+    <!--script src="tween.module.min.js"></script-->
+    <script src="animate.js"></script>
+    <script src="three.module.js"></script>
+    <script src="three.min.js"></script>
+    <script src="maze.js"></script>
+		<script src= "three.js"></script>
+    <script src="three.cjs"></script>
+		<script src= "FlakesTexture.js"></script>
+    <script src="RGBELoader.js"></script>
+		<script src= "OrbitControls.js"></script>
+    <script src="LightProbeGenerator.js"></script>
+		<script src= "RectAreaLightUniformsLib.js"></script>
+    <script src="tween.umd.js"></script>
+
+
+
+<!-- Chart JS -->
+<script src="wheelfile1.js"></script>
+<!-- Chart JS Plugin for displaying text over chart -->
+<script src="wheelfile2.js"></script>
+<!-- Script -->
+
+
+
+
+    <script>
+         
+      var lastturn =2;
+      var turn = 0;
+      var spacebarVal = 0; //0 is for rotation 1 is for no action 2 is for exit
+      var modal = document.getElementById("myModal");
+
+        var randVal;
+        var dicenum = 0;
+        const wheel = document.getElementById("wheel");
+        const spinBtn = document.getElementById("spin-btn");
+        const finalValue = document.getElementById("final-value");
+        //Object that stores values of minimum and maximum angle for a value
+        const rotationValues = [
+        { minDegree: 0, maxDegree: 30, value: 2 },
+        { minDegree: 31, maxDegree: 90, value: 1 },
+        { minDegree: 91, maxDegree: 150, value: 6 },
+        { minDegree: 151, maxDegree: 210, value: 5 },
+        { minDegree: 211, maxDegree: 270, value: 4 },
+        { minDegree: 271, maxDegree: 330, value: 3 },
+        { minDegree: 331, maxDegree: 360, value: 2 },
+        ];
+        //Size of each piece
+        const data = [16, 16, 16, 16, 16, 16];
+        //background color for each piece
+        var pieColors = [
+        "#4666AB",
+        "#5e7dbf",
+        "#4666AB",
+        "#5e7dbf",
+        "#4666AB",
+        "#5e7dbf",
+        ];
+
+
+        //Create chart
+        let myChart = new Chart(wheel, {
+        //Plugin for displaying text on pie chart
+        plugins: [ChartDataLabels],
+        //Chart Type Pie
+        type: "pie",
+        data: {
+        //Labels(values which are to be displayed on chart)
+        labels: [1, 2, 3, 4, 5, 6],
+        //Settings for dataset/pie
+        datasets: [ 
+          {
+            backgroundColor: pieColors,
+            data: data,
+          },
+        ],
+        },
+        options: {
+        //Responsive chart
+        responsive: true,
+        animation: { duration: 0 },
+        plugins: {
+          //hide tooltip and legend
+          tooltip: false,
+          legend: {
+            display: false,
+          },
+          //display labels inside pie chart
+          datalabels: {
+            color: "#ffffff",
+            formatter: (_, context) => context.chart.data.labels[context.dataIndex],
+            font: { size: 24 },
+          },
+        },
+        },
+        });
+        //display value based on the randomAngle
+        const valueGenerator = (angleValue) => {
+        for (let i of rotationValues) {
+        //if the angleValue is between min and max then display it
+        if (angleValue >= i.minDegree && angleValue <= i.maxDegree) {
+          finalValue.innerHTML = `<p>الخطوات : ${i.value} ، اضغط على المسافة مجددًا لاكمال اللعب</p>`;
+          dicenum = i.value ;
+          spinBtn.disabled = false;
+          break;
+        }
+        }
+        };
+        //Spinner count
+        let count = 0;
+        //100 rotations for animation and last rotation for result
+        let resultValue = 101;
+       
+   
+
+
+
+
+      //Start spinning
+      document.body.onkeyup = function(e) {
+        if (e.key == " " ||
+            e.code == "Space" ||      
+            e.keyCode == 32      
+        ) 
+        if(spacebarVal == 0)
+        {
+
+        spacebarVal = 1;
+         
+        //Empty final value
+        finalValue.innerHTML = `<p>!استعد</p>`;
+        //Generate random degrees to stop at
+        let randomDegree = Math.floor(Math.random() * (355 - 0 + 1) + 0);
+        //Interval for rotation animation
+        let rotationInterval = window.setInterval(() => {
+        //Set rotation for piechart
+        /*
+        Initially to make the piechart rotate faster we set resultValue to 101 so it rotates 101 degrees at a time and this reduces by 1 with every count. Eventually on last rotation we rotate by 1 degree at a time.
+        */
+        myChart.options.rotation = myChart.options.rotation + resultValue;
+        //Update chart with new value;
+        myChart.update();
+        //If rotation>360 reset it back to 0
+        if (myChart.options.rotation >= 360) {
+          count += 1;
+          resultValue -= 5;
+          myChart.options.rotation = 0;
+        } else if (count > 15 && myChart.options.rotation == randomDegree) {
+          valueGenerator(randomDegree);
+          clearInterval(rotationInterval);
+          count = 0;
+          resultValue = 101;
+
+          
+          if (lastturn == 2){
+            lastturn =1;
+            turn = 1;
+          }
+          else{
+            lastturn =2;
+            turn = 2;
+          }
+          spacebarVal = 2;
+        }
+        }, 10);
+
+
+        }
+        else if(spacebarVal == 1){
+
+        }
+
+        else if(spacebarVal == 2){
+          spacebarVal = 1;
+          modal.style.display = "none";
+        }
+
+      }
+
+
+   
+      
+
+      
+
+      var move;
+
+      var tween ;
+
+    
+
+
+      var varX;
+      var varY;
+      var wall;
+      var step;
+      var speed;
+      var goUp;
+      var goDn;
+      var goLt;
+      var goRt;
+
+      var xret;
+
+      var gobUp;
+      var gobDn;
+      var gobLt;
+      var gobRt;
+      var bspeed;
+      var bstep;
+      var varbY;
+      var varbX;
+
+
+      var cube;
+      
+
+      var gameState = 'fade in';
+      const mazeDimension  = 15;
+      const maze = [[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                    [0,1,1,1,0,0,1,1,1,1,1,1,1,1,0],
+                    [0,1,0,1,0,0,1,0,0,0,0,1,0,0,0],
+                    [0,0,0,1,1,1,1,0,0,0,0,1,0,0,0],
+                    [0,1,0,0,1,0,0,0,0,1,1,1,0,1,0],
+                    [0,1,0,0,1,0,0,0,0,1,0,1,1,1,0],
+                    [0,1,1,0,0,0,0,1,1,1,0,0,1,0,0],
+                    [0,0,1,0,0,0,0,1,0,0,0,0,1,1,0],
+                    [0,0,1,1,1,1,1,1,0,0,0,0,1,0,0],
+                    [0,0,0,1,0,0,0,1,1,1,1,0,1,0,0],
+                    [0,1,0,1,0,0,0,0,1,0,1,0,1,1,0],
+                    [0,1,1,1,1,1,0,1,1,0,1,0,1,0,0],
+                    [0,0,1,0,0,1,0,0,0,0,1,0,1,0,0],
+                    [0,1,1,0,0,1,1,1,1,1,1,0,0,0,0],
+                    [0,0,0,0,0,0,0,1,0,0,0,0,0,0,0],
+                    
+                    
+      ];
+
+
+
+        
+        
+        //create the scene
+        const scene = new THREE.Scene();
+        //scene.background = new THREE.Color(0xdddddd);
+
+        //set the camera
+        const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+        camera.position.z = 1.5;
+        camera.position.x = 1;
+        camera.position.y = 0.5;
+
+        //create the renderer
+        const renderer = new THREE.WebGLRenderer({alpha: true, antialias: true});
+        renderer.setSize( window.innerWidth, window.innerHeight );
+        document.body.appendChild( renderer.domElement );
+
+        //create cubes
+        const geometry = new THREE.BoxGeometry( 0.25, 0.25, 0.25 );
+        const material = new THREE.MeshStandardMaterial( { color: 0xffff99 } );
+        material.polygonOffset = true;
+        material.polygonOffsetFactor = -0.1;
+        //cube1
+        const cube1 = new THREE.Mesh( geometry, material );
+        cube1.castShadow = true;
+        cube1.receiveShadow = true;
+        scene.add( cube1 );
+        cube1.position.x = 1;
+        cube1.position.y = 1;
+        //cube2
+        const material2 = new THREE.MeshStandardMaterial( { color: 0x87CEEB } );
+        material2.polygonOffset = true;
+        material2.polygonOffsetFactor = -0.1;
+        const cube2 = new THREE.Mesh( geometry, material2 );
+        cube2.castShadow = true;
+        cube2.receiveShadow = true;
+        scene.add( cube2 );
+        cube2.position.x = 1;
+        cube2.position.y = 1;
+
+        //create maze
+        const wallGeo = new THREE.BoxGeometry( 1, 1, 1 );
+        const wallMaterial = new THREE.MeshStandardMaterial( { color: 0x609090 } );
+        for(let i=0; i<mazeDimension; i++)
+          for(let j=0; j<mazeDimension; j++)
+            if(maze[i][j] == 0)
+            {
+              wall = new THREE.Mesh( wallGeo, wallMaterial );
+              scene.add(wall);
+              wall.position.x = j;
+              wall.position.y = i;
+            }
+
+        //add plane
+        const plane = new THREE.Mesh(  new THREE.PlaneGeometry(100,100,100,100),  new THREE.MeshStandardMaterial({color: 0x609090}) );
+        plane.receiveShadow = true;
+        scene.add(plane);
+
+        //mazeMesh = generate_maze_mesh(maze);
+        //scene.add(mazeMesh);
+                  
+        //add the general light
+        var ambient = new THREE.AmbientLight( 0xffffff, 0 );
+        scene.add( ambient );
+        // Add the point light.
+        var light= new THREE.PointLight(0xffffff, 0);
+        light.position.set(1, 1, 0.3);
+        scene.add(light);
+        //set the camera    
+        camera.lookAt(cube1.position);
+        renderer.render( scene, camera );
+        
+
+        cube = cube1;
+
+///////////////////////////////////////////////////////////////////////////////////////////
+//animation of the camera
+
+    function moving(time){
+      TWEEN.default.update(time);
+      renderer.render( scene, camera );
+
+      if (Math.abs(camera.position.x - cube.position.x) < 0.005){
+        window.cancelAnimationFrame(move);
+        return;
+      }
+      move = window.requestAnimationFrame(moving);
+    }
+
+    //move camera
+    function moveCam(){
+
+      //the cube to move to
+      if (lastturn ==2) cube = cube1;
+      else if(lastturn == 1) cube = cube2;
+      
+      
+            
+      const coords = { x: camera.position.x, y: camera.position.y };
+      //make a new tween from the current position of the camera to its new position
+      new TWEEN.Tween(coords)
+      .to({ x: cube.position.x, y: cube.position.y-0.5 })
+      .easing(TWEEN.Easing.Quadratic.Out)
+      .onUpdate(() =>
+        camera.position.set(coords.x, coords.y, camera.position.z)
+      )
+      .start();
+       
+      
+      const coords2 = { x: light.position.x, y: light.position.y };
+      //make a new tween from the current position of the camera to its new position
+      new TWEEN.Tween(coords2)
+      .to({ x: cube.position.x, y: cube.position.y })
+      .easing(TWEEN.Easing.Quadratic.Out)
+      .onUpdate(() =>
+        light.position.set(coords2.x, coords2.y, light.position.z)
+      )
+      .start();
+
+
+       moving();
+       return;
+      
+    }
+///////////////////////////////////////////////////////////////////////////////////////////
+        function rollDice(){
+
+
+
+          if(cube1.position.x == 7 && cube1.position.y  == 14){
+            alert("مبارك! لقد فزت");
+            window.close() ;
+          }
+
+
+
+          if(cube2.position.x == 7 && cube2.position.y  == 14){
+            alert("مبارك! لقد فزت ");
+            window.close() ;
+          }
+
+
+      
+          if (dicenum == 0){
+            
+            turn = 0;
+             moveCam();
+            spacebarVal = 0;
+            modal.style.display = "block";   
+           
+            dicenum = randVal+1;
+           
+          }
+          
+
+          else dicenum--;
+          
+
+
+          return ;
+        }
+///////////////////////////////////////////////////////////////////////////////////////////
+      //movement
+        //remove listener
+        function removeListener(){
+          document.removeEventListener("keydown", onDocumentKeyDown);
+          return;
+        } 
+      //moving functions
+      //move up
+        function moveUp(){
+          removeListener();
+          varbY = varY;
+          //when facing a wall
+          i = Math.round(varY+1);
+          j = Math.round(varX);
+          if(maze[i][j] == 0){
+            return;}
+
+          cube1.position.y += speed;
+          step += speed;
+          camera.position.y += speed;
+          light.position.y += speed;
+          speed = speed* 0.9;
+          renderer.render( scene, camera );
+
+          if (step >= 0.95) {
+            cube1.position.y = varY+1;
+            camera.position.y = varY+0.5;
+            light.position.y = varY+1;
+            renderer.render( scene, camera );
+            window.cancelAnimationFrame(goUp);
+            gameState = 'dice';
+            return;}
+          //speed += 0.2;
+          goUp = window.requestAnimationFrame(moveUp);
+          
+        }
+
+        //move down
+        function moveDown(){
+          removeListener();
+
+          varbY = varY;
+          //when facing a wall
+          i = Math.round(varY-1);
+          j = Math.round(varX);
+          if(maze[i][j] == 0){
+            return;}
+
+          cube1.position.y -= speed;
+          light.position.y -= speed;
+          step += speed;
+          camera.position.y -= speed;
+          speed = speed* 0.9;
+          renderer.render( scene, camera );
+
+          if (step >= 0.95) {
+            cube1.position.y = varY-1;
+            camera.position.y = varY-1.5;
+            light.position.y = varY-1;
+            renderer.render( scene, camera );
+            cancelAnimationFrame(goDn);
+            gameState = 'dice';
+            return;}
+          //speed += 0.2;
+          goDn = requestAnimationFrame(moveDown);
+          
+        }
+
+        //move left
+        function moveLeft(){
+          removeListener();
+
+          varbX = varX;
+          //when facing a wall
+          i = Math.round(varY);
+          j = Math.round(varX-1);
+          if(maze[i][j] == 0){
+            return;}
+
+
+          cube1.position.x -= speed;
+          camera.position.x -= speed;
+          light.position.x -= speed;
+          step += speed;
+          speed = speed* 0.9;
+          renderer.render( scene, camera );
+
+          if (step >= 0.95) {
+            cube1.position.x = varX-1;
+            camera.position.x = varX-1;
+            light.position.x = varX-1;
+            renderer.render( scene, camera );
+            cancelAnimationFrame(goLt);
+            gameState = 'dice';
+            return;}
+          //speed += 0.2;
+          goLt = requestAnimationFrame(moveLeft);
+          
+        }
+
+        //move right
+        function moveRight(){
+          removeListener();
+
+          varbX = varX;
+          //when facing a wall
+          i = Math.round(varY);
+          j = Math.round(varX+1);
+          if(maze[i][j] == 0){
+            return;}
+
+          cube1.position.x += speed;
+          camera.position.x += speed;
+          light.position.x += speed;
+          step += speed;
+          speed = speed* 0.9;
+          renderer.render( scene, camera );
+
+          if (step >= 0.95) {
+            cube1.position.x = varX+1;
+            camera.position.x = varX+1;
+            light.position.x = varX+1;
+            renderer.render( scene, camera );
+            cancelAnimationFrame(goRt)
+            gameState = 'dice';
+            return;}
+          //speed += 0.2;
+          goRt = requestAnimationFrame(moveRight);
+          
+        }
+
+        
+
+        //function to control the keyboard
+        function onDocumentKeyDown(event) {
+          bstep = 0;
+          bspeed = 0.005;
+          varX = cube1.position.x;
+          varY = cube1.position.y;
+          var keyCode = event.which;
+          step = 0;
+          speed = 0.111;
+          if (modal.style.display == "block") return;
+          else if (keyCode == 38) moveUp();
+          else if (keyCode == 40) moveDown();
+          else if (keyCode == 37) moveLeft();
+          else if (keyCode == 39) moveRight();
+          //gameState = 'dice';
+          return;
+      }
+///////////////////////////////////////////////////////////////////////////////////////////
+      //movement of cube 2
+      //remove listener
+      function removeListener2(){
+        document.removeEventListener("keydown", onDocumentKeyDown2);
+        return;
+      } 
+    //moving functions
+    //move up 2
+      function moveUp2(){
+        removeListener2();
+        varbY = varY;
+        //when facing a wall
+        i = Math.round(varY+1);
+        j = Math.round(varX);
+        if(maze[i][j] == 0){
+          return;}
+
+        cube2.position.y += speed;
+        step += speed;
+        camera.position.y += speed;
+        light.position.y += speed;
+        speed = speed* 0.9;
+        renderer.render( scene, camera );
+
+        if (step >= 0.95) {
+          cube2.position.y = varY+1;
+          camera.position.y = varY+0.5;
+          light.position.y = varY+1;
+          renderer.render( scene, camera );
+          window.cancelAnimationFrame(goUp);
+          gameState = 'dice';
+          return;}
+        //speed += 0.2;
+        goUp = window.requestAnimationFrame(moveUp2);
+        
+      }
+
+      //move down
+      function moveDown2(){
+        removeListener2();
+
+        varbY = varY;
+        //when facing a wall
+        i = Math.round(varY-1);
+        j = Math.round(varX);
+        if(maze[i][j] == 0){
+          return;}
+
+        cube2.position.y -= speed;
+        light.position.y -= speed;
+        step += speed;
+        camera.position.y -= speed;
+        speed = speed* 0.9;
+        renderer.render( scene, camera );
+
+        if (step >= 0.95) {
+          cube2.position.y = varY-1;
+          camera.position.y = varY-1.5;
+          light.position.y = varY-1;
+          renderer.render( scene, camera );
+          cancelAnimationFrame(goDn);
+          gameState = 'dice';
+          return;}
+        //speed += 0.2;
+        goDn = requestAnimationFrame(moveDown2);
+        
+      }
+
+      //move left
+      function moveLeft2(){
+        removeListener2();
+
+        varbX = varX;
+        //when facing a wall
+        i = Math.round(varY);
+        j = Math.round(varX-1);
+        if(maze[i][j] == 0){
+          return;}
+
+
+        cube2.position.x -= speed;
+        camera.position.x -= speed;
+        light.position.x -= speed;
+        step += speed;
+        speed = speed* 0.9;
+        renderer.render( scene, camera );
+
+        if (step >= 0.95) {
+          cube2.position.x = varX-1;
+          camera.position.x = varX-1;
+          light.position.x = varX-1;
+          renderer.render( scene, camera );
+          cancelAnimationFrame(goLt);
+          gameState = 'dice';
+          return;}
+        //speed += 0.2;
+        goLt = requestAnimationFrame(moveLeft2);
+        
+      }
+
+      //move right
+      function moveRight2(){
+        removeListener2();
+
+        varbX = varX;
+        //when facing a wall
+        i = Math.round(varY);
+        j = Math.round(varX+1);
+        if(maze[i][j] == 0){
+          return;}
+
+        cube2.position.x += speed;
+        camera.position.x += speed;
+        light.position.x += speed;
+        step += speed;
+        speed = speed* 0.9;
+        renderer.render( scene, camera );
+
+        if (step >= 0.95) {
+          cube2.position.x = varX+1;
+          camera.position.x = varX+1;
+          light.position.x = varX+1;
+          renderer.render( scene, camera );
+          cancelAnimationFrame(goRt);
+          gameState = 'dice';
+          return;}
+        //speed += 0.2;
+        goRt = requestAnimationFrame(moveRight2);
+        
+      }
+
+      
+
+      //function to control the keyboard
+      function onDocumentKeyDown2(event) {
+
+        bstep = 0;
+        bspeed = 0.005;
+        varX = cube2.position.x;
+        varY = cube2.position.y;
+        var keyCode = event.which;
+        step = 0;
+        speed = 0.111;
+        if (modal.style.display == "block") return;
+        else if (keyCode == 38) moveUp2();
+        else if (keyCode == 40) moveDown2();
+        else if (keyCode == 37) moveLeft2();
+        else if (keyCode == 39) moveRight2();
+       // gameState = 'dice';
+        return;
+    }
+///////////////////////////////////////////////////////////////////////////////////////////
+      
+      gameMode();
+
+      function gameMode(){
+       
+        switch(gameState){
+
+         
+
+          case 'fade in':
+            light.intensity += 0.05 * (0.60 - light.intensity);
+            ambient.intensity += 0.008;
+            renderer.render(scene, camera);
+            //labelRenderer.render( scene, camera );
+            if (Math.abs(light.intensity - 0.60) < 0.05) {
+              light.intensity = 0.60;
+              ambient.intensity += 0.01;
+              gameState = 'dice';
+            }
+            break;
+
+          case 'dice':
+            rollDice();
+            if (turn ==1) gameState = 'player1';
+            else if (turn ==2) gameState = 'player2';
+            
+            break;
+
+          case 'player1':
+            document.addEventListener("keydown", onDocumentKeyDown, false);
+            break;
+
+          case 'player2':
+          document.addEventListener("keydown", onDocumentKeyDown2, false);
+          break;
+
+         
+
+        }
+        requestAnimationFrame(gameMode);
+      }
+
+
+
+    </script>
+
+
+
+
+
+
+
+  <style>
+          
+    body {
+        background: radial-gradient(#404040, #000000);
+        overflow: hidden;
+        margin: 0;
+        width: 100vw;
+        height : 100vw;
+        font-family: 'Helvetica';
+    }
+
+  </style>
+
+</body>
+
+
+</html>

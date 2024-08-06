@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Puzzle</title>
+    <link rel="stylesheet" href="puzzle.css"/>
+</head>
+
+<body onload="startGame()">
+    <div style="align-items: center;">
+    <div class="control-buttons">
+        <div>
+            <p> رتب الصور </p>
+            <span id = "start">أبدأ اللعبة</span>
+        </div>
+      </div>
+
+    <div id="board">
+    </div> 
+
+    <div class="wrong" id="wrong">
+        <div>
+            <p>للأسف هناك خطأ </p>
+            <span>أكمل اللعبة</span>
+        </div>
+    </div>
+
+    <button onclick="check()" style="margin: 10px; border: 1px solid  #2b8a8d;
+    background-color: #2b8a8d;; color: rgb(0, 0, 0);
+    padding: 15px 25px;
+    font-size: 20px;
+    text-align: center;
+    border-radius: 6px; ">انتهيت</button> 
+
+    <div id="pieces">
+    </div>
+
+    <div class="question" id="question">
+        <form action="">
+            <p>أحسنت، والآن ما نوع هذا الجهاز؟</p>
+            <input type="radio" id="a" name="cell" value="عصبي"><label>عصبي</label><br>
+            <input type="radio" id="b" name="cell" value="تنفسي"><label>تنفسي</label><br>
+            <input type="radio" id="b" name="cell" value="هضمي"><label>هضمي</label><br>
+            <input type="submit" value="تأكيد" style="margin: 10px; border: 1px solid  #2b8a8d;
+            background-color: #2b8a8d;; color: rgb(0, 0, 0);
+            padding: 15px 25px;
+            font-size: 20px;
+            text-align: center;
+            border-radius: 6px; ">
+        </form>
+    </div>
+</div>
+    <script src="puzzle.js"></script>
+</body>
+</html>
